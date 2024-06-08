@@ -15,6 +15,10 @@ class ErrorHandler {
     static getUnauthorized(res, message = 'Not valid authentication credentials') {
         res.status(401).json({ message: message });
     }
+
+    static getBadRequest(res, message = 'Bad request') {
+        res.status(400).json({ message: message });
+    }
 }
 
 module.exports = ErrorHandler;
