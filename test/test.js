@@ -23,7 +23,7 @@ describe('Register workflow tests', () => {
     test('Internal error - missing data', async () => {
 
         const response = await request(server).post('/user/signup').send( { email : 'error@example.com'});
-        expect(response.statusCode).toBe(500);
+        expect(response.statusCode).toBe(400);
     });
 
 });
