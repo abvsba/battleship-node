@@ -1,13 +1,11 @@
 
 const User = require('../models/user');
 
-const bcrypt = require('bcryptjs');
 const express = require('express');
 
 const ErrorHandler = require('./error');
 const authController = require("../controller/auth");
 const router = express.Router();
-
 
 
 router.post('/signup', async (req, res) => {
@@ -28,3 +26,4 @@ router.post('/signup', async (req, res) => {
     }
 });
 
+module.exports = router;
