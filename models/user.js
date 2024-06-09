@@ -8,25 +8,15 @@ module.exports = class User {
     }
 
     static async find(username) {
-        try {
-            return await db.promise().query(
-                'SELECT * FROM users WHERE username = ?', [username]
-            );
-        } catch (error) {
-            console.error('Error searching user:', error);
-            throw error;
-        }
+        return db.promise().query(
+            'SELECT * FROM users WHERE username = ?', [username]
+        );
     }
 
     static async save(user) {
-        try {
-            return await db.promise().execute(
-                'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
-                [user.username, user.email, user.password]
-            );
-        } catch (error) {
-            console.error('Error saving user:', error);
-            throw error;
-        }
+        return db.promise().execute(
+            'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
+            [user.username, user.email, user.password]
+        );
     }
 }
