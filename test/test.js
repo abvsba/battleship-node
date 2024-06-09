@@ -7,23 +7,51 @@ const users = [
     new User('user2', 'user2@example.com', 'test'),
 ]
 
-describe('Register workflow tests', () => {
-    test('Register new user', async () => {
+describe('User workflow tests', () => {
 
-        const response = await request(server).post('/user/signup').send(users[0]);
-        expect(response.statusCode).toBe(201);
+    describe('Resgiter tests', () => {
+
+        test('Register new user', async () => {
+
+            const response = await request(server).post('/user/signup').send(users[0]);
+            expect(response.statusCode).toBe(201);
+        });
+
+        test('Conflict username', async () => {
+
+            const response = await request(server).post('/user/signup').send(users[0]);
+            expect(response.statusCode).toBe(409);
+        });
+
     });
 
-    test('Conflict username', async () => {
 
-        const response = await request(server).post('/user/signup').send(users[0]);
-        expect(response.statusCode).toBe(409);
-    });
+    describe('Login tests', () => {
 
-    test('Internal error - missing data', async () => {
+        test("Incorrect credentials", async () => {
+            const response = await request(server).post("/user/login").send({
+                username: users[0].username,
+                password: 'incorrectPassword'
+            })
+            expect(response.statusCode).toBe(401);
+        })
 
-        const response = await request(server).post('/user/signup').send( { email : 'error@example.com'});
-        expect(response.statusCode).toBe(500);
+        test("User not found", async () => {
+            const response = await request(server).post("/user/login").send({
+                username: 'noExist',
+                password: users[0].password
+            })
+            expect(response.statusCode).toBe(404);
+        })
+
+        test("Login user", async () => {
+            const response = await request(server).post("/user/login").send({
+                username: users[0].username,
+                password: users[0].password
+            })
+            expect(response.statusCode).toBe(200);
+        })
+
     });
 
 });
