@@ -11,6 +11,10 @@ const router = express.Router();
 router.post('/signup', async (req, res) => {
     let user = req.body;
     try {
+        if (user.username == null) {
+            return ErrorHandler.getBadRequest(res, 'Bad request')
+        }
+
         const [storedUser] = await User.find(user.username);
 
         if (storedUser.length > 0) {
