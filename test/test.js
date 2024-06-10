@@ -71,4 +71,81 @@ describe('User workflow tests', () => {
 
     });
 
+
+    describe('Change password - workflow tests', () => {
+        let token;
+
+        test('Register new user', async () => {
+            const response = await request(server).post('/user/signup').send(users[2]);
+            expect(response.statusCode).toBe(201);
+        });
+
+        test("Login user", async () => {
+            const response = await request(server).post("/user/login").send({
+                username: users[2].username,
+                password: users[2].password
+            })
+            token = response.body.token;
+            expect(response.statusCode).toBe(200);
+        })
+
+        test("User not found when change password", async () => {
+            const response = await request(server).patch(`/user/noExist/password`).send({
+                oldPassword : users[2].password,
+                newPassword: users[2].password
+            }).set('Authorization', token);
+            expect(response.statusCode).toBe(404);
+        })
+
+        test("Change password bad request", async () => {
+            const response = await request(server).patch(`/user/${users[2].username}/password`).set('Authorization', token);
+            expect(response.statusCode).toBe(400);
+        })
+
+        test("Change password without authorization", async () => {
+            const response = await request(server).patch(`/user/${users[2].username}/password`).send({
+                oldPassword : users[2].password,
+                newPassword: users[2].password
+            })
+            expect(response.statusCode).toBe(401);
+        })
+
+        test("User incorrect old password", async () => {
+            const response = await request(server).patch(`/user/${users[2].username}/password`).send( {
+                oldPassword : 'incorrectOldPassword',
+                newPassword : 'newPassword'
+            } ).set('Authorization', token);
+
+            expect(response.statusCode).toBe(401);
+        })
+
+        test("Change password 1", async () => {
+            const response = await request(server).patch(`/user/${users[2].username}/password`).send({
+                oldPassword : users[2].password,
+                newPassword : 'newPassword'
+            }).set('Authorization', token);
+
+            expect(response.statusCode).toBe(200);
+        })
+
+        test("Login user changed password", async () => {
+            const response = await request(server).post(`/user/login`).send({
+                username: users[2].username,
+                password: 'newPassword'
+            })
+            expect(response.statusCode).toBe(200);
+        })
+
+        test("Change password 2", async () => {
+            const response = await request(server).patch(`/user/${users[2].username}/password`).send({
+                oldPassword : 'newPassword',
+                newPassword : users[2].password,
+            }).set('Authorization', token);
+
+            expect(response.statusCode).toBe(200);
+        })
+
+    });
+
+
 });
