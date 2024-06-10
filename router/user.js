@@ -9,12 +9,15 @@ const router = express.Router();
 
 
 router.post('/signup', async (req, res) => {
+
     let user = req.body;
+    if (user.username === undefined || user.email === undefined || user.password === undefined) {
+        return ErrorHandler.getBadRequest(res);
+    }
     try {
         if (user.username == null) {
             return ErrorHandler.getBadRequest(res, 'Bad request')
         }
-
         const [storedUser] = await User.find(user.username);
 
         if (storedUser.length > 0) {
@@ -32,12 +35,16 @@ router.post('/signup', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
+
+    let username = req.body.username;
+    if (username === undefined) {
+        return ErrorHandler.getBadRequest(res);
+    }
     try {
-        const [storedUser] = await User.find(req.body.username);
+        const [storedUser] = await User.find(username);
         if (storedUser.length <= 0) {
             return ErrorHandler.getNotFound(res, 'User not found');
         }
-
         const isEqual = await bcrypt.compare(req.body.password, storedUser[0].password);
 
         if (!isEqual) {
