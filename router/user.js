@@ -91,4 +91,21 @@ router.patch('/:username/password', authController.verifyToken, async (req, res)
     }
 });
 
+
+router.get('/:username', async (req, res) => {
+    const username = req.params.username;
+
+    try {
+        const [storedUser] = await User.find(username);
+        if (storedUser.length <= 0) {
+            return ErrorHandler.getNotFound(res, 'User not found');
+        }
+        return res.status(200).json( { username : storedUser[0].username} );
+
+    } catch (error) {
+        console.log(error);
+        return ErrorHandler.getInternalError(res, error, 'Error retrieving user');
+    }
+});
+
 module.exports = router;
