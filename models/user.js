@@ -19,4 +19,8 @@ module.exports = class User {
             [user.username, user.email, user.password]
         );
     }
+
+    static async updatePassword(password, username) {
+        return db.promise().execute('UPDATE users SET password = ? WHERE username = ?', [password, username]);
+    }
 }

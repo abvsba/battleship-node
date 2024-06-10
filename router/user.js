@@ -54,4 +54,34 @@ router.post('/login', async (req, res) => {
     }
 });
 
+
+router.patch('/:username/password', authController.verifyToken, async (req, res) => {
+    const username = req.params.username;
+    const oldPassword = req.body.oldPassword;
+    const newPassword = req.body.newPassword;
+
+    if (username === undefined || oldPassword === undefined || newPassword === undefined) {
+        return ErrorHandler.getBadRequest(res);
+    }
+    try {
+        const [storedUser] = await User.find(username);
+        if (storedUser.length <= 0) {
+            return ErrorHandler.getNotFound(res, 'User not found');
+        }
+
+        const isEqual = await bcrypt.compare(oldPassword, storedUser[0].password);
+        if (!isEqual) {
+            return res.status(401).json({ error: 'Incorrect old password' });
+        }
+
+        const hashedPassword = await authController.hashPassword(newPassword);
+        await User.updatePassword(hashedPassword, username);
+        return res.status(200).json({message: 'Password updated'});
+    }
+    catch (error) {
+        console.log(error);
+        return ErrorHandler.getInternalError(res, error, 'Error updating password');
+    }
+});
+
 module.exports = router;
