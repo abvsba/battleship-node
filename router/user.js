@@ -62,8 +62,8 @@ router.post('/login', async (req, res) => {
 });
 
 
-router.patch('/:username/password', authController.verifyToken, async (req, res) => {
-    const username = req.params.username;
+router.patch('/:userId/password', authController.verifyToken, async (req, res) => {
+    const userId = req.params.userId;
     const oldPassword = req.body.oldPassword;
     const newPassword = req.body.newPassword;
 
@@ -71,7 +71,7 @@ router.patch('/:username/password', authController.verifyToken, async (req, res)
         return ErrorHandler.getBadRequest(res);
     }
     try {
-        const [storedUser] = await User.findByUsername(username);
+        const [storedUser] = await User.findByUserId(userId);
         if (storedUser.length <= 0) {
             return ErrorHandler.getNotFound(res, 'User not found');
         }
@@ -82,7 +82,7 @@ router.patch('/:username/password', authController.verifyToken, async (req, res)
         }
 
         const hashedPassword = await authController.hashPassword(newPassword);
-        await User.updatePassword(hashedPassword, username);
+        await User.updatePassword(hashedPassword, userId);
         return res.status(200).json({message: 'Password updated'});
     }
     catch (error) {
