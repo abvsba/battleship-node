@@ -18,7 +18,7 @@ router.post('/signup', async (req, res) => {
         if (user.username == null) {
             return ErrorHandler.getBadRequest(res, 'Bad request')
         }
-        const [storedUser] = await User.find(user.username);
+        const [storedUser] = await User.findByUsername(user.username);
 
         if (storedUser.length > 0) {
             return ErrorHandler.getConflictError(res, `Name ${user.username} already exists`)
@@ -41,7 +41,7 @@ router.post('/login', async (req, res) => {
         return ErrorHandler.getBadRequest(res);
     }
     try {
-        const [storedUser] = await User.find(username);
+        const [storedUser] = await User.findByUsername(username);
         if (storedUser.length <= 0) {
             return ErrorHandler.getNotFound(res, 'User not found');
         }
@@ -67,11 +67,11 @@ router.patch('/:username/password', authController.verifyToken, async (req, res)
     const oldPassword = req.body.oldPassword;
     const newPassword = req.body.newPassword;
 
-    if (username === undefined || oldPassword === undefined || newPassword === undefined) {
+    if (oldPassword === undefined || newPassword === undefined) {
         return ErrorHandler.getBadRequest(res);
     }
     try {
-        const [storedUser] = await User.find(username);
+        const [storedUser] = await User.findByUsername(username);
         if (storedUser.length <= 0) {
             return ErrorHandler.getNotFound(res, 'User not found');
         }
@@ -96,7 +96,7 @@ router.get('/:username', async (req, res) => {
     const username = req.params.username;
 
     try {
-        const [storedUser] = await User.find(username);
+        const [storedUser] = await User.findByUsername(username);
         if (storedUser.length <= 0) {
             return ErrorHandler.getNotFound(res, 'User not found');
         }
@@ -105,6 +105,23 @@ router.get('/:username', async (req, res) => {
     } catch (error) {
         console.log(error);
         return ErrorHandler.getInternalError(res, error, 'Error retrieving user');
+    }
+});
+
+router.delete('/:userId', authController.verifyToken, async (req, res) => {
+    try {
+        const [storedUser] = await User.findByUserId(req.params.userId);
+
+        console.log(storedUser);
+        if (storedUser.length <= 0) {
+            return res.status(204).json({message: "User not found"});
+        }
+        const deleteResponse = User.delete(req.params.userId);
+        return res.status(200).json(deleteResponse);
+
+    } catch (error) {
+        console.log(error);
+        return ErrorHandler.getInternalError(res, error);
     }
 });
 

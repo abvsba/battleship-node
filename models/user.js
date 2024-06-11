@@ -7,9 +7,15 @@ module.exports = class User {
         this.password = password;
     }
 
-    static async find(username) {
+    static async findByUsername(username) {
         return db.promise().query(
             'SELECT * FROM users WHERE username = ?', [username]
+        );
+    }
+
+    static async findByUserId(userid) {
+        return db.promise().query(
+            'SELECT * FROM users WHERE id = ?', [userid]
         );
     }
 
@@ -18,6 +24,10 @@ module.exports = class User {
             'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
             [user.username, user.email, user.password]
         );
+    }
+
+    static async delete(userId) {
+        return db.promise().execute('DELETE FROM users WHERE id = ?', [userId]);
     }
 
     static async updatePassword(password, username) {
