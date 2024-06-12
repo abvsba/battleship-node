@@ -1,6 +1,7 @@
 const request = require('supertest');
 const server = require('../index.js');
 const User = require("../models/user");
+const {decode} = require("jsonwebtoken");
 
 const users = [
     new User('user1', 'user1@example.com', 'test'),
@@ -71,6 +72,20 @@ describe('User workflow tests', () => {
 
     });
 
+    describe('Check get user', () => {
+
+        test("Get user", async () => {
+            const response = await request(server).get(`/users/${users[0].username}`);
+            expect(response.statusCode).toBe(200);
+        })
+
+        test("Get user not found", async () => {
+            const response = await request(server).get('/users/noExist');
+            expect(response.statusCode).toBe(404);
+        })
+
+    });
+
 
     describe('Change password - workflow tests', () => {
         let token, decoded;
@@ -86,7 +101,7 @@ describe('User workflow tests', () => {
                 password: users[2].password
             })
             token = response.body.token;
-            decoded = jwt.decode(token);
+            decoded = decode(token);
             expect(response.statusCode).toBe(200);
         })
 
@@ -164,7 +179,7 @@ describe('User workflow tests', () => {
                 password: users[1].password
             })
             token = response.body.token;
-            decoded = jwt.decode(token);
+            decoded = decode(token);
             expect(response.statusCode).toBe(200);
         })
 
@@ -181,7 +196,7 @@ describe('User workflow tests', () => {
 
 
     test("truncate user table from database", async () => {
-        await User.truncateUserTable();
+        await User.deleteUsersFromTable();
     })
 
 
