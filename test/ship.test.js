@@ -5,12 +5,12 @@ const Ship = require("../models/ship");
 const User = require("../models/user");
 const {decode} = require("jsonwebtoken");
 
-const rivalShip = [
+const rivalShips = [
     new Ship('carrier', 5, true, true, 0, {row: 0, col: 1}),
     new Ship('submarine', 3, false, true, 0, {row: 2, col: 1}),
 ];
 
-const selfShip = [
+const selfShips = [
     new Ship('battleship', 4, false, false, 0, {row: 0, col: 0}),
     new Ship('patrolBoat', 2, false, true, 1, {row: 1, col: 1}),
 ];
@@ -24,11 +24,11 @@ const user = new User('user3', 'user3@example.com', 'test');
 
 const game = {
     name : 'test',
-    selfShip: selfShip,
-    rivalShip: rivalShip,
+    selfShips: selfShips,
+    rivalShips: rivalShips,
     selfBoard : selfBoard,
     rivalBoard : rivalBoard,
-    totalPlayerBooms : 10,
+    totalPlayerHits : 10,
     fireDirection : 0,
     previousShots : previousShots
 }
