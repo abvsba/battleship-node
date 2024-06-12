@@ -54,6 +54,21 @@ describe('Run ship test', () => {
             expect(response.statusCode).toBe(200);
         })
 
+        test("Retrieve list game without authorization", async () => {
+            const response = await request(server).get(`/users/${decoded.id}/games/`);
+            expect(response.statusCode).toBe(401);
+        })
+
+
+        test("Not found game", async () => {
+            const response = await request(server).get(`/users/${decoded.id}/games/1000`).set('Authorization', token);
+            expect(response.statusCode).toBe(404);
+        })
+
+        test("Not found ship", async () => {
+            const response = await request(server).get("/game/1").set('Authorization', token);
+            expect(response.statusCode).toBe(404);
+        })
 
         test("Save ship without authorization", async () => {
             const response = await request(server).post(`/users/${decoded.id}/games/save`).send({game : game})
@@ -73,6 +88,21 @@ describe('Run ship test', () => {
 
             gameId = response.body.gameId;
             expect(response.statusCode).toBe(201);
+        })
+
+        test("Retrieve ship without authorization", async () => {
+            const response = await request(server).get(`/users/${decoded.id}/games/${gameId}`)
+            expect(response.statusCode).toBe(401);
+        })
+
+        test("Retrieve game", async () => {
+            const response = await request(server).get(`/users/${decoded.id}/games`).set('Authorization', token);
+            expect(response.statusCode).toBe(200);
+        })
+
+        test("Retrieve ship", async () => {
+            const response = await request(server).get(`/users/${decoded.id}/games/${gameId}`).set('Authorization', token);
+            expect(response.statusCode).toBe(200);
         })
 
     });
