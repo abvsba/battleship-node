@@ -35,9 +35,9 @@ module.exports = class User {
     }
 
 
-    static async truncateUserTable() {
+    static async deleteUsersFromTable() {
         return db.promise().execute(
-            'TRUNCATE TABLE battleship_test.users'
+            'DELETE FROM battleship_test.users'
         );
     }
 }
