@@ -8,7 +8,6 @@ const createUserTable = `
       password VARCHAR(255) NOT NULL
     )
   `;
-
 connection.query(createUserTable, (err) => {
     if (err) {
         console.error('Error in create users table:', err);
@@ -17,53 +16,112 @@ connection.query(createUserTable, (err) => {
     console.log('Table users created...');
 });
 
+//======================================================
 
-const createRivalShipTable = `
-    CREATE TABLE IF NOT EXISTS rivalShipTable (
-        id INT AUTO_INCREMENT PRIMARY KEY
-    )
-`;
-
-connection.query(createRivalShipTable);
-
-const createRivalShip = `
-    CREATE TABLE IF NOT EXISTS rivalShips (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      type VARCHAR(255) UNIQUE NOT NULL,
-      length INT,
-      isHorizontal BOOLEAN,
-      isVisible BOOLEAN,
-      oldHead VARCHAR(255),
-      head VARCHAR(255),
-      FOREIGN KEY (id) REFERENCES rivalShipTable(id)
-    )
-  `;
-
-connection.query(createRivalShip);
-
-const createSelfShipTable = `
-    CREATE TABLE IF NOT EXISTS selfShipTable (
+const createGames = `
+    CREATE TABLE IF NOT EXISTS games (
         id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        date VARCHAR(255) NOT NULL,
+        fireDirection INT,
+        totalHits INT NOT NULL,
+        user_id INT,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+`;
+connection.query(createGames);
+
+//=====================================================
+
+const createHistoricalTable = `
+    CREATE TABLE IF NOT EXISTS games (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        totalHitsSelf INT NOT NULL,
+        totalHitRival INT NOT NULL,
+        timeConsumed INT NOT NULL,
+        username VARCHAR(255) UNIQUE NOT NULL,
+        win BOOLEAN,
+        user_id INT,
+        FOREIGN KEY (user_id) REFERENCES users(id)
     )
 `;
 
-connection.query(createSelfShipTable);
+connection.query(createHistoricalTable);
 
-const createSelfShip = `
-    CREATE TABLE IF NOT EXISTS selfShips (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      type VARCHAR(255) UNIQUE NOT NULL,
-      length INT,
-      isHorizontal BOOLEAN,
-      isVisible BOOLEAN,
-      oldHead VARCHAR(255),
-      head VARCHAR(255),
-      FOREIGN KEY (id) REFERENCES rivalShipTable(id)
+//=====================================================
+
+const createPreviousShotsTable = `
+    CREATE TABLE IF NOT EXISTS previous_shots (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        row INT,
+        col INT,
+        game_id INT,
+        FOREIGN KEY (game_id) REFERENCES games(id)
+    )
+`;
+connection.query(createPreviousShotsTable);
+
+//======================================================
+
+const createSelfShips = `
+     CREATE TABLE IF NOT EXISTS self_ships (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        type VARCHAR(255) NOT NULL,
+        length INT,
+        isHorizontal BOOLEAN,
+        isVisible BOOLEAN,
+        hit INT,
+        head VARCHAR(255) NOT NULL,
+        game_id INT,
+        FOREIGN KEY (game_id) REFERENCES games(id)
+    )
+`;
+connection.query(createSelfShips);
+
+//======================================================
+
+const createRivalShips = `
+    CREATE TABLE IF NOT EXISTS rival_Ships (
+       id INT AUTO_INCREMENT PRIMARY KEY,
+        type VARCHAR(255) NOT NULL,
+        length INT,
+        isHorizontal BOOLEAN,
+        isVisible BOOLEAN,
+        hit INT,
+        head VARCHAR(255) NOT NULL,
+        game_id INT,
+        FOREIGN KEY (game_id) REFERENCES games(id)
     )
   `;
+connection.query(createRivalShips);
 
-connection.query(createSelfShip);
+//======================================================
 
-// connection.end()
+
+const createSelfBoard = `
+     CREATE TABLE IF NOT EXISTS self_board (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        row INT,
+        col INT,
+        hit VARCHAR(255),
+        game_id INT,
+        FOREIGN KEY (game_id) REFERENCES games(id)
+    )
+`;
+connection.query(createSelfBoard);
+
+//======================================================
+
+const createRivalBoard = `
+     CREATE TABLE IF NOT EXISTS rival_board (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        row INT,
+        col INT,
+        hit VARCHAR(255),
+        game_id INT,
+        FOREIGN KEY (game_id) REFERENCES games(id)
+    )
+`;
+connection.query(createRivalBoard);
 
 module.exports = connection;
