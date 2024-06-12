@@ -14,25 +14,25 @@ module.exports = class Ship {
     static async saveGame(game, userid, date) {
 
         const results = await db.promise().execute(
-            'INSERT INTO games (name, date, user_id) VALUES (?, ?, ?)', [game.name, date, userid]
+            'INSERT INTO games (name, date, fireDirection, totalHits, user_id) VALUES (?, ?, ?, ?, ?)',
+            [game.name, date, game.fireDirection, game.totalHits, userid]
         );
 
         let gameId = results[0].insertId;
 
-        console.log()
         for (let i = 0; i < game.selfShips.length; i++) {
             await this.saveShip(gameId, game.selfShips[i], 'self_ships');
             await this.saveShip(gameId, game.rivalShips[i], 'rival_ships');
         }
 
-        console.log(game.rivalBoard)
-
         for (let cell of game.selfBoard) {
-            await this.saveCell(gameId, cell, 'self_board');
+            await this.saveCellWithHit(gameId, cell, 'self_board');
         }
-
         for (let cell of game.rivalBoard) {
-            await this.saveCell(gameId, cell, 'rival_board');
+            await this.saveCellWithHit(gameId, cell, 'rival_board');
+        }
+        for (let cell of game.previousShots) {
+            await this.saveCell(gameId, cell);
         }
 
         return gameId;
@@ -52,13 +52,22 @@ module.exports = class Ship {
     }
 
 
-    static async saveCell(gameId, cell, table) {
+    static async saveCellWithHit(gameId, cell, table) {
 
         let hit = cell.hit === undefined ? null : cell.hit;
 
         return db.promise().execute(
             'INSERT INTO ' + table + ' (row, col, hit, game_id) VALUES (?, ?, ?, ?)',
             [cell.row, cell.col, hit, gameId]
+        );
+
+    }
+
+    static async saveCell(gameId, cell) {
+
+        return db.promise().execute(
+            'INSERT INTO previous_shots (row, col, game_id) VALUES (?, ?, ?)',
+            [cell.row, cell.col, gameId]
         );
 
     }
