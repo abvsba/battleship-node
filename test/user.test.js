@@ -20,13 +20,13 @@ describe('User workflow tests', () => {
             expect(response.statusCode).toBe(201);
         });
 
-        test('Conflict username', async () => {
+        test('Conflict username - expected 409', async () => {
 
             const response = await request(server).post('/users/signup').send(users[0]);
             expect(response.statusCode).toBe(409);
         });
 
-        test('Resgiter user bad request', async () => {
+        test('Register - expected 400', async () => {
             const response = await request(server).post('/users/signup').send(users[0].username);
             expect(response.statusCode).toBe(400);
         });
@@ -56,7 +56,7 @@ describe('User workflow tests', () => {
 
         test("Incorrect credentials", async () => {
             const response = await request(server).post("/users/login").send({
-                username: users[0].username,
+                username: users[3].username,
                 password: 'incorrectPassword'
             })
             expect(response.statusCode).toBe(401);
@@ -67,20 +67,6 @@ describe('User workflow tests', () => {
                 username: 'noExist',
                 password: users[0].password
             })
-            expect(response.statusCode).toBe(404);
-        })
-
-    });
-
-    describe('Check get user', () => {
-
-        test("Get user", async () => {
-            const response = await request(server).get(`/users/${users[0].username}`);
-            expect(response.statusCode).toBe(200);
-        })
-
-        test("Get user not found", async () => {
-            const response = await request(server).get('/users/noExist');
             expect(response.statusCode).toBe(404);
         })
 
@@ -105,7 +91,7 @@ describe('User workflow tests', () => {
             expect(response.statusCode).toBe(200);
         })
 
-        test("User not found when change password", async () => {
+        test("Change password - expected 404", async () => {
             const response = await request(server).patch(`/users/noExist/password`).send({
                 oldPassword : users[2].password,
                 newPassword: users[2].password
@@ -113,12 +99,12 @@ describe('User workflow tests', () => {
             expect(response.statusCode).toBe(404);
         })
 
-        test("Change password bad request", async () => {
+        test("Change password - expected 400", async () => {
             const response = await request(server).patch(`/users/${decoded.id}/password`).set('Authorization', token);
             expect(response.statusCode).toBe(400);
         })
 
-        test("Change password without authorization", async () => {
+        test("Change password - expected 401", async () => {
             const response = await request(server).patch(`/users/${decoded.id}/password`).send({
                 oldPassword : users[2].password,
                 newPassword: users[2].password
@@ -135,7 +121,7 @@ describe('User workflow tests', () => {
             expect(response.statusCode).toBe(401);
         })
 
-        test("Change password 1", async () => {
+        test("Change password - expected 200", async () => {
             const response = await request(server).patch(`/users/${decoded.id}/password`).send({
                 oldPassword : users[2].password,
                 newPassword : 'newPassword'
@@ -144,7 +130,7 @@ describe('User workflow tests', () => {
             expect(response.statusCode).toBe(200);
         })
 
-        test("Login user changed password", async () => {
+        test("Login user changed - expected 200", async () => {
             const response = await request(server).post(`/users/login`).send({
                 username: users[2].username,
                 password: 'newPassword'
@@ -164,7 +150,7 @@ describe('User workflow tests', () => {
     });
 
 
-    describe('Register, login and delete user - workflow tests', () => {
+    describe('Delete and get user - workflow tests', () => {
 
         let token, decoded;
 
@@ -172,6 +158,16 @@ describe('User workflow tests', () => {
             const response = await request(server).post('/users/signup').send(users[1]);
             expect(response.statusCode).toBe(201);
         });
+
+        test("Get user", async () => {
+            const response = await request(server).get(`/users/${users[1].username}`);
+            expect(response.statusCode).toBe(200);
+        })
+
+        test("Get user - expected 404", async () => {
+            const response = await request(server).get('/users/noExist');
+            expect(response.statusCode).toBe(404);
+        })
 
         test("Login user", async () => {
             const response = await request(server).post("/users/login").send({
@@ -181,6 +177,11 @@ describe('User workflow tests', () => {
             token = response.body.token;
             decoded = decode(token);
             expect(response.statusCode).toBe(200);
+        })
+
+        test("Delete user - expected 200", async () => {
+            const response = await request(server).delete(`/users/${decoded.id}`)
+            expect(response.statusCode).toBe(401);
         })
 
         test("Delete user - expected 200", async () => {
@@ -195,7 +196,7 @@ describe('User workflow tests', () => {
     });
 
 
-    test("truncate user table from database", async () => {
+    test("delete user table from database", async () => {
         await User.deleteUsersFromTable();
     })
 

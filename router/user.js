@@ -1,10 +1,11 @@
-
 const User = require('../models/user');
+const Ship = require('../models/ship');
 
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const ErrorHandler = require('./error');
 const authController = require("../controller/auth");
+const {convertShip} = require("../util/util");
 const router = express.Router();
 
 
@@ -121,5 +122,26 @@ router.delete('/:userId', authController.verifyToken, async (req, res) => {
         return ErrorHandler.getInternalError(res, error);
     }
 });
+
+
+//================================================================ GAME ==========================================================================================
+
+router.post('/:userId/games/save', authController.verifyToken, async (req, res) => {
+    const game = req.body.game;
+    const userId = req.params.userId;
+
+    if (game === undefined) {
+        return ErrorHandler.getBadRequest(res);
+    }
+    try {
+        const gameId = await Ship.saveGame(game, userId, new Date()
+        );
+        return res.status(201).json({message: 'Ship saved', gameId: gameId});
+    }
+    catch (error) {
+        return ErrorHandler.getInternalError(res, error, 'Error saving game');
+    }
+});
+
 
 module.exports = router;
