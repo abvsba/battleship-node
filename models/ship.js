@@ -15,7 +15,7 @@ module.exports = class Ship {
 
         const results = await db.promise().execute(
             'INSERT INTO games (name, date, fireDirection, totalHits, user_id) VALUES (?, ?, ?, ?, ?)',
-            [game.name, date, game.fireDirection, game.totalHits, userid]
+            [game.name, date, game.fireDirection, game.totalPlayerHits, userid]
         );
 
         let gameId = results[0].insertId;
@@ -70,6 +70,22 @@ module.exports = class Ship {
             [cell.row, cell.col, gameId]
         );
 
+    }
+
+    static async deleteAllTable() {
+        try {
+            await Promise.all([
+                await db.promise().execute('DELETE FROM battleship_test.rival_board;'),
+                await db.promise().execute('DELETE FROM battleship_test.self_board;'),
+                await db.promise().execute('DELETE FROM battleship_test.rival_ships;'),
+                await db.promise().execute('DELETE FROM battleship_test.self_ships;'),
+                await db.promise().execute('DELETE FROM battleship_test.previous_shots;'),
+                await db.promise().execute('DELETE FROM battleship_test.games;'),
+                await db.promise().execute('DELETE FROM battleship_test.users;'),
+            ]);
+        } catch (error) {
+            console.error('Error deleting user or games:', error);
+        }
     }
 
 }
