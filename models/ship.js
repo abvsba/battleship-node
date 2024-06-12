@@ -10,6 +10,24 @@ module.exports = class Ship {
         this.head = head;
     }
 
+    static async findGamesByUserId(userId) {
+        return db.promise().query(
+            'SELECT * FROM games where user_id = ?', [userId]
+        );
+    }
+
+    static async findGamesByUserIdAndGameId(userId, gameId) {
+        return db.promise().query(
+            'SELECT * FROM games where user_id = ? and id = ?', [userId, gameId]
+        );
+    }
+
+
+    static async findShipsAndCellsByGame(gameId, table) {
+        return db.promise().query(
+            'SELECT * FROM ' + table + ' WHERE game_id = ?', [gameId]
+        );
+    }
 
     static async saveGame(game, userid, date) {
 

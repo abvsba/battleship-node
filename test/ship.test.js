@@ -5,12 +5,12 @@ const Ship = require("../models/ship");
 const User = require("../models/user");
 const {decode} = require("jsonwebtoken");
 
-const rivalShip = [
+const rivalShips = [
     new Ship('carrier', 5, true, true, 0, {row: 0, col: 1}),
     new Ship('submarine', 3, false, true, 0, {row: 2, col: 1}),
 ];
 
-const selfShip = [
+const selfShips = [
     new Ship('battleship', 4, false, false, 0, {row: 0, col: 0}),
     new Ship('patrolBoat', 2, false, true, 1, {row: 1, col: 1}),
 ];
@@ -24,11 +24,11 @@ const user = new User('user3', 'user3@example.com', 'test');
 
 const game = {
     name : 'test',
-    selfShip: selfShip,
-    rivalShip: rivalShip,
+    selfShips: selfShips,
+    rivalShips: rivalShips,
     selfBoard : selfBoard,
     rivalBoard : rivalBoard,
-    totalPlayerBooms : 10,
+    totalPlayerHits : 10,
     fireDirection : 0,
     previousShots : previousShots
 }
@@ -54,6 +54,21 @@ describe('Run ship test', () => {
             expect(response.statusCode).toBe(200);
         })
 
+        test("Retrieve list game without authorization", async () => {
+            const response = await request(server).get(`/users/${decoded.id}/games/`);
+            expect(response.statusCode).toBe(401);
+        })
+
+
+        test("Not found game", async () => {
+            const response = await request(server).get(`/users/${decoded.id}/games/1000`).set('Authorization', token);
+            expect(response.statusCode).toBe(404);
+        })
+
+        test("Not found ship", async () => {
+            const response = await request(server).get("/game/1").set('Authorization', token);
+            expect(response.statusCode).toBe(404);
+        })
 
         test("Save ship without authorization", async () => {
             const response = await request(server).post(`/users/${decoded.id}/games/save`).send({game : game})
@@ -73,6 +88,21 @@ describe('Run ship test', () => {
 
             gameId = response.body.gameId;
             expect(response.statusCode).toBe(201);
+        })
+
+        test("Retrieve ship without authorization", async () => {
+            const response = await request(server).get(`/users/${decoded.id}/games/${gameId}`)
+            expect(response.statusCode).toBe(401);
+        })
+
+        test("Retrieve game", async () => {
+            const response = await request(server).get(`/users/${decoded.id}/games`).set('Authorization', token);
+            expect(response.statusCode).toBe(200);
+        })
+
+        test("Retrieve ship", async () => {
+            const response = await request(server).get(`/users/${decoded.id}/games/${gameId}`).set('Authorization', token);
+            expect(response.statusCode).toBe(200);
         })
 
     });

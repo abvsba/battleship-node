@@ -139,9 +139,63 @@ router.post('/:userId/games/save', authController.verifyToken, async (req, res) 
         return res.status(201).json({message: 'Ship saved', gameId: gameId});
     }
     catch (error) {
+        console.log(error);
         return ErrorHandler.getInternalError(res, error, 'Error saving game');
     }
 });
 
+
+
+router.get('/:userId/games/:gameId', authController.verifyToken, async (req, res) => {
+    const userId = req.params.userId;
+    const gameId = req.params.gameId;
+
+    try {
+        let game = await Ship.findGamesByUserIdAndGameId(userId, gameId);
+        if (!game) {
+            return ErrorHandler.getNotFound(res, 'Game not found');
+        }
+
+        const [storedSelfShip] = await Ship.findShipsAndCellsByGame(gameId, 'self_ships');
+        const [storedRivalShip] = await Ship.findShipsAndCellsByGame(gameId, 'rival_ships');
+
+        const [storedSelfBoard] = await Ship.findShipsAndCellsByGame(gameId, 'self_board');
+        const [storedRivalBoard] = await Ship.findShipsAndCellsByGame(gameId, 'rival_board');
+
+        if (storedSelfShip.length <= 0 || storedRivalShip.length <= 0) {
+            return ErrorHandler.getNotFound(res, 'Ship not found');
+        }
+
+        for (let i = 0; i < storedSelfShip.length; i++) {
+            convertShip(storedSelfShip[i]);
+            convertShip(storedRivalShip[i]);
+        }
+
+        return res.status(200).json(
+            { ships : [storedSelfShip, storedRivalShip], selfBoard : storedSelfBoard, rivalBoard : storedRivalBoard });
+    }
+    catch (error) {
+        console.log(error);
+        return ErrorHandler.getInternalError(res, error, 'Error retrieving game by id');
+    }
+});
+
+
+router.get('/:userId/games', authController.verifyToken, async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        const [storedGames] = await Ship.findGamesByUserId(userId);
+
+        if (storedGames.length <= 0) {
+            return ErrorHandler.getNotFound(res, 'Game not found');
+        }
+        return res.status(200).json(storedGames);
+    }
+    catch (error) {
+        console.log(error);
+        return ErrorHandler.getInternalError(res, error, 'Error retrieving games');
+    }
+});
 
 module.exports = router;
