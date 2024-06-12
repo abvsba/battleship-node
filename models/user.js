@@ -33,4 +33,11 @@ module.exports = class User {
     static async updatePassword(password, username) {
         return db.promise().execute('UPDATE users SET password = ? WHERE username = ?', [password, username]);
     }
+
+
+    static async truncateUserTable() {
+        return db.promise().execute(
+            'TRUNCATE TABLE battleship_test.users'
+        );
+    }
 }

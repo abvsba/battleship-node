@@ -149,4 +149,40 @@ describe('User workflow tests', () => {
     });
 
 
+    describe('Register, login and delete user - workflow tests', () => {
+
+        let token, decoded;
+
+        test('Register new user', async () => {
+            const response = await request(server).post('/users/signup').send(users[1]);
+            expect(response.statusCode).toBe(201);
+        });
+
+        test("Login user", async () => {
+            const response = await request(server).post("/users/login").send({
+                username: users[1].username,
+                password: users[1].password
+            })
+            token = response.body.token;
+            decoded = jwt.decode(token);
+            expect(response.statusCode).toBe(200);
+        })
+
+        test("Delete user - expected 200", async () => {
+            const response = await request(server).delete(`/users/${decoded.id}`).set('Authorization', token);
+            expect(response.statusCode).toBe(200);
+        })
+
+        test("Delete user - expected 204", async () => {
+            const response = await request(server).delete(`/users/${decoded.id}`).set('Authorization', token);
+            expect(response.statusCode).toBe(204);
+        })
+    });
+
+
+    test("truncate user table from database", async () => {
+        await User.truncateUserTable();
+    })
+
+
 });
