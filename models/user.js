@@ -30,8 +30,8 @@ module.exports = class User {
         return db.promise().execute('DELETE FROM users WHERE id = ?', [userId]);
     }
 
-    static async updatePassword(password, username) {
-        return db.promise().execute('UPDATE users SET password = ? WHERE username = ?', [password, username]);
+    static async updatePassword(password, userId) {
+        return db.promise().execute('UPDATE users SET password = ? WHERE id = ?', [password, userId]);
     }
 
 

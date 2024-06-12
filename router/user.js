@@ -50,10 +50,8 @@ router.post('/login', async (req, res) => {
         if (!isEqual) {
             return ErrorHandler.getUnauthorized(res, 'Incorrect password');
         }
-
         const token = await authController.getToken(storedUser[0]);
-        return res.status(200).json(
-            {token: token, username: storedUser[0].username, email: storedUser[0].email});
+        return res.status(200).json({ token: token });
 
     } catch (error) {
         console.log(error);
