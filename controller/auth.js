@@ -23,7 +23,7 @@ exports.hashPassword = async (password) => {
 
 exports.getToken = async (user) => {
     return jwt.sign(
-        {username: user.username, email: user.email},
+        {id : user.id, username: user.username, email: user.email},
         secretKey,
         {expiresIn: '1h'}
     );
