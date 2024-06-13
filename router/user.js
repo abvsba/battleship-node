@@ -131,13 +131,15 @@ router.post('/:userId/history', authController.verifyToken, async (req, res) => 
     const userId = req.params.userId;
     const gameDetails = req.body;
 
-    console.log(gameDetails);
-
+    if (gameDetails.username === undefined || gameDetails.totalHits === undefined || gameDetails.timeConsumed === undefined ||
+        gameDetails.result === undefined || gameDetails.date === undefined) {
+        return ErrorHandler.getBadRequest(res);
+    }
     try {
         const [storedUser] = await User.findByUserId(userId);
 
         if (storedUser.length <= 0) {
-            return ErrorHandler.getNotFound("User not found");
+            return ErrorHandler.getNotFound(res, "User not found");
         }
         await User.saveGameDetails(gameDetails, userId, new Date());
         return res.status(201).json( {message: 'game details created'} );
@@ -154,7 +156,7 @@ router.post('/:userId/games/save', authController.verifyToken, async (req, res) 
     const game = req.body.game;
     const userId = req.params.userId;
 
-    if (game === undefined) {
+    if (game.name === undefined || game.date === undefined || game.fireDirection === undefined || game.totalHits === undefined) {
         return ErrorHandler.getBadRequest(res);
     }
     try {
