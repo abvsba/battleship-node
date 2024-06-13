@@ -38,7 +38,7 @@ module.exports = class User {
     static async saveGameDetails(gameDetails, user_id, date) {
         return db.promise().execute(
             'INSERT INTO game_history (totalHits, timeConsumed, username, result, date, user_id) VALUES (?, ?, ?, ?, ?, ?)',
-            [gameDetails.totalHits, gameDetails.timeConsumed, gameDetails.username, gameDetails.result, date, user_id]
+            [gameDetails.totalPlayerHits, gameDetails.timeConsumed, gameDetails.username, gameDetails.result, date, user_id]
         );
     }
 

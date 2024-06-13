@@ -23,11 +23,18 @@ module.exports = class Ship {
     }
 
 
-    static async findShipsAndCellsByGame(gameId, table) {
+    static async findByGameId(gameId, table) {
         return db.promise().query(
             'SELECT * FROM ' + table + ' WHERE game_id = ?', [gameId]
         );
     }
+
+    static async findGameByGameId(gameId) {
+        return db.promise().query(
+            'SELECT * FROM games WHERE id = ?', [gameId]
+        );
+    }
+
 
     static async saveGame(game, userid, date) {
 
