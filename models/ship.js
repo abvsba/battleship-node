@@ -23,11 +23,18 @@ module.exports = class Ship {
     }
 
 
-    static async findShipsAndCellsByGame(gameId, table) {
+    static async findByGameId(gameId, table) {
         return db.promise().query(
             'SELECT * FROM ' + table + ' WHERE game_id = ?', [gameId]
         );
     }
+
+    static async findGameByGameId(gameId) {
+        return db.promise().query(
+            'SELECT * FROM games WHERE id = ?', [gameId]
+        );
+    }
+
 
     static async saveGame(game, userid, date) {
 
@@ -90,14 +97,9 @@ module.exports = class Ship {
 
     }
 
-    static async deleteAllTable() {
+    static async deleteGameAndUserTable() {
         try {
             await Promise.all([
-                await db.promise().execute('DELETE FROM battleship_test.rival_board;'),
-                await db.promise().execute('DELETE FROM battleship_test.self_board;'),
-                await db.promise().execute('DELETE FROM battleship_test.rival_ships;'),
-                await db.promise().execute('DELETE FROM battleship_test.self_ships;'),
-                await db.promise().execute('DELETE FROM battleship_test.previous_shots;'),
                 await db.promise().execute('DELETE FROM battleship_test.games;'),
                 await db.promise().execute('DELETE FROM battleship_test.users;'),
             ]);

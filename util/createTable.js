@@ -26,7 +26,7 @@ const createGames = `
         fireDirection INT,
         totalHits INT NOT NULL,
         user_id INT,
-        FOREIGN KEY (user_id) REFERENCES users(id)
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )
 `;
 connection.query(createGames);
@@ -42,7 +42,7 @@ const createHistoryTable = `
         result VARCHAR(255) NOT NULL,
         date VARCHAR(255) NOT NULL,
         user_id INT,
-        FOREIGN KEY (user_id) REFERENCES users(id)
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )
 `;
 
@@ -56,7 +56,7 @@ const createPreviousShotsTable = `
         row INT,
         col INT,
         game_id INT,
-        FOREIGN KEY (game_id) REFERENCES games(id)
+        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
     )
 `;
 connection.query(createPreviousShotsTable);
@@ -73,7 +73,7 @@ const createSelfShips = `
         hit INT,
         head VARCHAR(255) NOT NULL,
         game_id INT,
-        FOREIGN KEY (game_id) REFERENCES games(id)
+        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
     )
 `;
 connection.query(createSelfShips);
@@ -90,7 +90,7 @@ const createRivalShips = `
         hit INT,
         head VARCHAR(255) NOT NULL,
         game_id INT,
-        FOREIGN KEY (game_id) REFERENCES games(id)
+        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
     )
   `;
 connection.query(createRivalShips);
@@ -105,7 +105,7 @@ const createSelfBoard = `
         col INT,
         hit VARCHAR(255),
         game_id INT,
-        FOREIGN KEY (game_id) REFERENCES games(id)
+        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
     )
 `;
 connection.query(createSelfBoard);
@@ -119,7 +119,7 @@ const createRivalBoard = `
         col INT,
         hit VARCHAR(255),
         game_id INT,
-        FOREIGN KEY (game_id) REFERENCES games(id)
+        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
     )
 `;
 connection.query(createRivalBoard);

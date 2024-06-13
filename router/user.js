@@ -115,7 +115,7 @@ router.delete('/:userId', authController.verifyToken, async (req, res) => {
         if (storedUser.length <= 0) {
             return res.status(204).json({message: "User not found"});
         }
-        const deleteResponse = User.delete(req.params.userId);
+        const deleteResponse = User.deleteUser(req.params.userId);
         return res.status(200).json(deleteResponse);
 
     } catch (error) {
@@ -197,24 +197,32 @@ router.get('/:userId/games/:gameId', authController.verifyToken, async (req, res
         if (!game) {
             return ErrorHandler.getNotFound(res, 'Game not found');
         }
+        const [storedSelfShip] = await Ship.findByGameId(gameId, 'self_ships');
+        const [storedRivalShip] = await Ship.findByGameId(gameId, 'rival_ships');
 
-        const [storedSelfShip] = await Ship.findShipsAndCellsByGame(gameId, 'self_ships');
-        const [storedRivalShip] = await Ship.findShipsAndCellsByGame(gameId, 'rival_ships');
+        const [storedSelfBoard] = await Ship.findByGameId(gameId, 'self_board');
+        const [storedRivalBoard] = await Ship.findByGameId(gameId, 'rival_board');
 
-        const [storedSelfBoard] = await Ship.findShipsAndCellsByGame(gameId, 'self_board');
-        const [storedRivalBoard] = await Ship.findShipsAndCellsByGame(gameId, 'rival_board');
+        const [storedPreviousShots] = await Ship.findByGameId(gameId, 'previous_shots');
+
+        const [storedGame] = await Ship.findGameByGameId(gameId);
 
         if (storedSelfShip.length <= 0 || storedRivalShip.length <= 0) {
             return ErrorHandler.getNotFound(res, 'Ship not found');
         }
-
         for (let i = 0; i < storedSelfShip.length; i++) {
             convertShip(storedSelfShip[i]);
             convertShip(storedRivalShip[i]);
         }
 
         return res.status(200).json(
-            { ships : [storedSelfShip, storedRivalShip], selfBoard : storedSelfBoard, rivalBoard : storedRivalBoard });
+            { ships : [storedSelfShip, storedRivalShip],
+                selfBoard : storedSelfBoard,
+                rivalBoard : storedRivalBoard,
+                previousShots : storedPreviousShots,
+                fireDirection : storedGame.fireDirection,
+                totalPlayerHits : storedGame.totalPlayerHits
+            });
     }
     catch (error) {
         console.log(error);
