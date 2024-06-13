@@ -220,8 +220,7 @@ router.get('/:userId/games/:gameId', authController.verifyToken, async (req, res
                 selfBoard : storedSelfBoard,
                 rivalBoard : storedRivalBoard,
                 previousShots : storedPreviousShots,
-                fireDirection : storedGame.fireDirection,
-                totalPlayerHits : storedGame.totalPlayerHits
+                gameData : storedGame
             });
     }
     catch (error) {
