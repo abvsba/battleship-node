@@ -172,23 +172,23 @@ describe('User workflow tests', () => {
         })
 
         test("User not found when save game details", async () => {
-            const response = await request(server).post(`/users/noExist/history`).send(gameDetails)
+            const response = await request(server).post(`/users/noExist/histories`).send(gameDetails)
                 .set('Authorization', token);
             expect(response.statusCode).toBe(404);
         })
 
         test("Save game details - expected 400", async () => {
-            const response = await request(server).post(`/users/${decoded.id}/history`).set('Authorization', token);
+            const response = await request(server).post(`/users/${decoded.id}/histories`).set('Authorization', token);
             expect(response.statusCode).toBe(400);
         })
 
         test("Save game details - expected 401", async () => {
-            const response = await request(server).post(`/users/${decoded.id}/history`).send(gameDetails);
+            const response = await request(server).post(`/users/${decoded.id}/histories`).send(gameDetails);
             expect(response.statusCode).toBe(401);
         })
 
         test("Save game details - expected 201", async () => {
-            const response = await request(server).post(`/users/${decoded.id}/history`).send(gameDetails)
+            const response = await request(server).post(`/users/${decoded.id}/histories`).send(gameDetails)
                 .set('Authorization', token);
             expect(response.statusCode).toBe(201);
         })

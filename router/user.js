@@ -126,13 +126,13 @@ router.delete('/:userId', authController.verifyToken, async (req, res) => {
 
 
 
-router.post('/:userId/history', authController.verifyToken, async (req, res) => {
+router.post('/:userId/histories', authController.verifyToken, async (req, res) => {
 
     const userId = req.params.userId;
     const gameDetails = req.body;
 
-    if (gameDetails.username === undefined || gameDetails.totalHits === undefined || gameDetails.timeConsumed === undefined ||
-        gameDetails.result === undefined || gameDetails.date === undefined) {
+    if (gameDetails.username === undefined || gameDetails.totalHits === undefined ||
+        gameDetails.timeConsumed === undefined || gameDetails.result === undefined ) {
         return ErrorHandler.getBadRequest(res);
     }
     try {
@@ -150,13 +150,31 @@ router.post('/:userId/history', authController.verifyToken, async (req, res) => 
     }
 });
 
+router.get('/:userId/histories', async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        const [storedUser] = await User.findByUserId(userId);
+        if (storedUser.length <= 0) {
+            return ErrorHandler.getNotFound(res, 'User not found');
+        }
+
+        const [gameHistory] = await User.findGameDetailsByUserId(userId);
+        return res.status(200).json(gameHistory);
+
+    } catch (error) {
+        console.log(error);
+        return ErrorHandler.getInternalError(res, error, 'Error retrieving game history');
+    }
+});
+
 //================================================================ GAME ==========================================================================================
 
 router.post('/:userId/games/save', authController.verifyToken, async (req, res) => {
     const game = req.body.game;
     const userId = req.params.userId;
 
-    if (game.name === undefined || game.date === undefined || game.fireDirection === undefined || game.totalHits === undefined) {
+    if (game.name === undefined || game.fireDirection === undefined || game.totalHits === undefined) {
         return ErrorHandler.getBadRequest(res);
     }
     try {

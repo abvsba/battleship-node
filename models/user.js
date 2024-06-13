@@ -13,9 +13,9 @@ module.exports = class User {
         );
     }
 
-    static async findByUserId(userid) {
+    static async findByUserId(userId) {
         return db.promise().query(
-            'SELECT * FROM users WHERE id = ?', [userid]
+            'SELECT * FROM users WHERE id = ?', [userId]
         );
     }
 
@@ -39,6 +39,12 @@ module.exports = class User {
         return db.promise().execute(
             'INSERT INTO game_history (totalHits, timeConsumed, username, result, date, user_id) VALUES (?, ?, ?, ?, ?, ?)',
             [gameDetails.totalHits, gameDetails.timeConsumed, gameDetails.username, gameDetails.result, date, user_id]
+        );
+    }
+
+    static async findGameDetailsByUserId(userId) {
+        return db.promise().query(
+            'SELECT * FROM game_history WHERE user_id = ? LIMIT 10', [userId]
         );
     }
 
