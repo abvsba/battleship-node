@@ -150,7 +150,7 @@ router.post('/:userId/histories', authController.verifyToken, async (req, res) =
     }
 });
 
-router.get('/:userId/histories', async (req, res) => {
+router.get('/:userId/histories', authController.verifyToken, async (req, res) => {
     const userId = req.params.userId;
 
     try {
@@ -158,7 +158,6 @@ router.get('/:userId/histories', async (req, res) => {
         if (storedUser.length <= 0) {
             return ErrorHandler.getNotFound(res, 'User not found');
         }
-
         const [gameHistory] = await User.findGameDetailsByUserId(userId);
         return res.status(200).json(gameHistory);
 
@@ -174,7 +173,7 @@ router.post('/:userId/games/save', authController.verifyToken, async (req, res) 
     const game = req.body.game;
     const userId = req.params.userId;
 
-    if (game.name === undefined || game.fireDirection === undefined || game.totalHits === undefined) {
+    if (game === undefined || game.name === undefined || game.fireDirection === undefined || game.totalPlayerHits === undefined) {
         return ErrorHandler.getBadRequest(res);
     }
     try {

@@ -193,6 +193,22 @@ describe('User workflow tests', () => {
             expect(response.statusCode).toBe(201);
         })
 
+
+        test("Retrieve game history - expected 401", async () => {
+            const response = await request(server).get(`/users/${decoded.id}/histories`)
+            expect(response.statusCode).toBe(401);
+        })
+
+        test("Retrieve game history - expected 200", async () => {
+            const response = await request(server).get(`/users/NoExiste/histories`).set('Authorization', token);
+            expect(response.statusCode).toBe(404);
+        })
+
+        test("Retrieve game history - expected 200", async () => {
+            const response = await request(server).get(`/users/${decoded.id}/histories`).set('Authorization', token);
+            expect(response.statusCode).toBe(200);
+        })
+
     });
 
 
