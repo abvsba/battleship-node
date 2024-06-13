@@ -13,9 +13,9 @@ module.exports = class User {
         );
     }
 
-    static async findByUserId(userid) {
+    static async findByUserId(userId) {
         return db.promise().query(
-            'SELECT * FROM users WHERE id = ?', [userid]
+            'SELECT * FROM users WHERE id = ?', [userId]
         );
     }
 
@@ -35,9 +35,29 @@ module.exports = class User {
     }
 
 
-    static async deleteUsersFromTable() {
+    static async saveGameDetails(gameDetails, user_id, date) {
         return db.promise().execute(
-            'DELETE FROM battleship_test.users'
+            'INSERT INTO game_history (totalHits, timeConsumed, username, result, date, user_id) VALUES (?, ?, ?, ?, ?, ?)',
+            [gameDetails.totalHits, gameDetails.timeConsumed, gameDetails.username, gameDetails.result, date, user_id]
         );
+    }
+
+    static async findGameDetailsByUserId(userId) {
+        return db.promise().query(
+            'SELECT * FROM game_history WHERE user_id = ? LIMIT 10', [userId]
+        );
+    }
+
+
+    static async deleteUsersAndHistoryFromTable() {
+        try {
+            await Promise.all([
+                await db.promise().execute('DELETE FROM battleship_test.game_history'),
+                await db.promise().execute('DELETE FROM battleship_test.users'),
+            ]);
+        } catch (error) {
+            console.error('Error deleting user or history:', error);
+        }
+
     }
 }

@@ -8,7 +8,10 @@ const users = [
     new User('user2', 'user2@example.com', 'test'),
     new User('user4', 'user4@example.com', 'test'),
     new User('user5', 'user5@example.com', 'test'),
+    new User('user6', 'user6@example.com', 'test'),
 ]
+
+const gameDetails = { username : 'maria', totalHits : 12, timeConsumed : 30, result : 'win', date : new Date()}
 
 describe('User workflow tests', () => {
 
@@ -150,6 +153,65 @@ describe('User workflow tests', () => {
     });
 
 
+    describe('Save and retrieve history - workflow tests', () => {
+        let token, decoded;
+
+        test('Register new user', async () => {
+            const response = await request(server).post('/users/signup').send(users[4]);
+            expect(response.statusCode).toBe(201);
+        });
+
+        test("Login user", async () => {
+            const response = await request(server).post("/users/login").send({
+                username: users[4].username,
+                password: users[4].password
+            })
+            token = response.body.token;
+            decoded = decode(token);
+            expect(response.statusCode).toBe(200);
+        })
+
+        test("User not found when save game details", async () => {
+            const response = await request(server).post(`/users/noExist/histories`).send(gameDetails)
+                .set('Authorization', token);
+            expect(response.statusCode).toBe(404);
+        })
+
+        test("Save game details - expected 400", async () => {
+            const response = await request(server).post(`/users/${decoded.id}/histories`).set('Authorization', token);
+            expect(response.statusCode).toBe(400);
+        })
+
+        test("Save game details - expected 401", async () => {
+            const response = await request(server).post(`/users/${decoded.id}/histories`).send(gameDetails);
+            expect(response.statusCode).toBe(401);
+        })
+
+        test("Save game details - expected 201", async () => {
+            const response = await request(server).post(`/users/${decoded.id}/histories`).send(gameDetails)
+                .set('Authorization', token);
+            expect(response.statusCode).toBe(201);
+        })
+
+
+        test("Retrieve game history - expected 401", async () => {
+            const response = await request(server).get(`/users/${decoded.id}/histories`)
+            expect(response.statusCode).toBe(401);
+        })
+
+        test("Retrieve game history - expected 200", async () => {
+            const response = await request(server).get(`/users/NoExiste/histories`).set('Authorization', token);
+            expect(response.statusCode).toBe(404);
+        })
+
+        test("Retrieve game history - expected 200", async () => {
+            const response = await request(server).get(`/users/${decoded.id}/histories`).set('Authorization', token);
+            expect(response.statusCode).toBe(200);
+        })
+
+    });
+
+
     describe('Delete and get user - workflow tests', () => {
 
         let token, decoded;
@@ -196,8 +258,8 @@ describe('User workflow tests', () => {
     });
 
 
-    test("delete user table from database", async () => {
-        await User.deleteUsersFromTable();
+    test("delete user and game history table from database", async () => {
+        await User.deleteUsersAndHistoryFromTable();
     })
 
 
