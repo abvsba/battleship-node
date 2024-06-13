@@ -115,7 +115,7 @@ router.delete('/:userId', authController.verifyToken, async (req, res) => {
         if (storedUser.length <= 0) {
             return res.status(204).json({message: "User not found"});
         }
-        const deleteResponse = User.delete(req.params.userId);
+        const deleteResponse = User.deleteUser(req.params.userId);
         return res.status(200).json(deleteResponse);
 
     } catch (error) {

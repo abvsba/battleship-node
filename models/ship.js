@@ -90,14 +90,9 @@ module.exports = class Ship {
 
     }
 
-    static async deleteAllTable() {
+    static async deleteGameAndUserTable() {
         try {
             await Promise.all([
-                await db.promise().execute('DELETE FROM battleship_test.rival_board;'),
-                await db.promise().execute('DELETE FROM battleship_test.self_board;'),
-                await db.promise().execute('DELETE FROM battleship_test.rival_ships;'),
-                await db.promise().execute('DELETE FROM battleship_test.self_ships;'),
-                await db.promise().execute('DELETE FROM battleship_test.previous_shots;'),
                 await db.promise().execute('DELETE FROM battleship_test.games;'),
                 await db.promise().execute('DELETE FROM battleship_test.users;'),
             ]);

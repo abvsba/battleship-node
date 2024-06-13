@@ -108,8 +108,8 @@ describe('Run ship test', () => {
     });
 
 
-    test("delete content from all table from database", async () => {
-        await Ship.deleteAllTable()
+    test('Delete content from game and user tables', async () => {
+        await Ship.deleteGameAndUserTable();
     })
 
 })

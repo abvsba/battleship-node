@@ -258,8 +258,8 @@ describe('User workflow tests', () => {
     });
 
 
-    test("delete user and game history table from database", async () => {
-        await User.deleteUsersAndHistoryFromTable();
+    test("Delete user and game history table", async () => {
+        await User.deleteUserFromTable();
     })
 
 
