@@ -33,20 +33,20 @@ connection.query(createGames);
 
 //=====================================================
 
-const createHistoricalTable = `
-    CREATE TABLE IF NOT EXISTS games (
+const createHistoryTable = `
+    CREATE TABLE IF NOT EXISTS game_history (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        totalHitsSelf INT NOT NULL,
-        totalHitRival INT NOT NULL,
+        totalHits INT NOT NULL,
         timeConsumed INT NOT NULL,
-        username VARCHAR(255) UNIQUE NOT NULL,
-        win BOOLEAN,
+        username VARCHAR(255) NOT NULL,
+        result VARCHAR(255) NOT NULL,
+        date VARCHAR(255) NOT NULL,
         user_id INT,
         FOREIGN KEY (user_id) REFERENCES users(id)
     )
 `;
 
-connection.query(createHistoricalTable);
+connection.query(createHistoryTable);
 
 //=====================================================
 

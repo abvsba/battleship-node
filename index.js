@@ -1,5 +1,5 @@
 require('dotenv').config();
-// require('./util/createTable');
+require('./util/createTable');
 
 const userRoute = require('./router/user');
 
@@ -8,7 +8,7 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 
-//app.listen(port, () => console.log(`Listening on port ${port}`));
+app.listen(port, () => console.log(`Listening on port ${port}`));
 
 app.use(express.urlencoded( {extended : true}));
 app.use(express.json());

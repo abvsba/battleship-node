@@ -43,6 +43,7 @@ router.post('/login', async (req, res) => {
     }
     try {
         const [storedUser] = await User.findByUsername(username);
+
         if (storedUser.length <= 0) {
             return ErrorHandler.getNotFound(res, 'User not found');
         }
@@ -124,6 +125,29 @@ router.delete('/:userId', authController.verifyToken, async (req, res) => {
 });
 
 
+
+router.post('/:userId/history', authController.verifyToken, async (req, res) => {
+
+    const userId = req.params.userId;
+    const gameDetails = req.body;
+
+    console.log(gameDetails);
+
+    try {
+        const [storedUser] = await User.findByUserId(userId);
+
+        if (storedUser.length <= 0) {
+            return ErrorHandler.getNotFound("User not found");
+        }
+        await User.saveGameDetails(gameDetails, userId, new Date());
+        return res.status(201).json( {message: 'game details created'} );
+
+    } catch (error) {
+        console.log(error);
+        return ErrorHandler.getInternalError(res, error);
+    }
+});
+
 //================================================================ GAME ==========================================================================================
 
 router.post('/:userId/games/save', authController.verifyToken, async (req, res) => {
@@ -134,8 +158,7 @@ router.post('/:userId/games/save', authController.verifyToken, async (req, res) 
         return ErrorHandler.getBadRequest(res);
     }
     try {
-        const gameId = await Ship.saveGame(game, userId, new Date()
-        );
+        const gameId = await Ship.saveGame(game, userId, new Date());
         return res.status(201).json({message: 'Ship saved', gameId: gameId});
     }
     catch (error) {
@@ -197,5 +220,8 @@ router.get('/:userId/games', authController.verifyToken, async (req, res) => {
         return ErrorHandler.getInternalError(res, error, 'Error retrieving games');
     }
 });
+
+
+
 
 module.exports = router;
