@@ -41,6 +41,7 @@ const createHistoryTable = `
         username VARCHAR(255) NOT NULL,
         result VARCHAR(255) NOT NULL,
         date VARCHAR(255) NOT NULL,
+        punctuation INT,
         user_id INT,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )

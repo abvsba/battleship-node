@@ -92,7 +92,7 @@ router.patch('/:userId/password', authController.verifyToken, async (req, res) =
 });
 
 
-router.get('/:username', async (req, res) => {
+router.get('/:username/username', async (req, res) => {
     const username = req.params.username;
 
     try {
@@ -104,9 +104,27 @@ router.get('/:username', async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        return ErrorHandler.getInternalError(res, error, 'Error retrieving user');
+        return ErrorHandler.getInternalError(res, error, 'Error retrieving username');
     }
 });
+
+
+router.get('/:email/email', async (req, res) => {
+    const email = req.params.email;
+
+    try {
+        const [storedUser] = await User.findByEmail(email);
+        if (storedUser.length <= 0) {
+            return ErrorHandler.getNotFound(res, 'User not found');
+        }
+        return res.status(200).json( { email : storedUser[0].email} );
+
+    } catch (error) {
+        console.log(error);
+        return ErrorHandler.getInternalError(res, error, 'Error retrieving email');
+    }
+});
+
 
 router.delete('/:userId', authController.verifyToken, async (req, res) => {
     try {
@@ -167,13 +185,30 @@ router.get('/:userId/histories', authController.verifyToken, async (req, res) =>
     }
 });
 
+
+router.get('/histories', async (req, res) => {
+
+    try {
+        const [storedUser] = await User.retrieveRanking();
+        if (storedUser.length <= 0) {
+            return ErrorHandler.getNotFound(res, 'Ranking not found');
+        }
+        return res.status(200).json(storedUser);
+
+    } catch (error) {
+        console.log(error);
+        return ErrorHandler.getInternalError(res, error, 'Error retrieving game history');
+    }
+});
+
 //================================================================ GAME ==========================================================================================
 
 router.post('/:userId/games/save', authController.verifyToken, async (req, res) => {
     const game = req.body.game;
     const userId = req.params.userId;
 
-    if (game === undefined || game.name === undefined || game.fireDirection === undefined || game.totalPlayerHits === undefined) {
+    if (game === undefined || game.name === undefined || game.fireDirection === undefined ||
+        game.totalPlayerHits === undefined || game.previousShots === undefined) {
         return ErrorHandler.getBadRequest(res);
     }
     try {
