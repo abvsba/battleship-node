@@ -92,7 +92,7 @@ router.patch('/:userId/password', authController.verifyToken, async (req, res) =
 });
 
 
-router.get('/:username', async (req, res) => {
+router.get('/user/:username', async (req, res) => {
     const username = req.params.username;
 
     try {
@@ -160,6 +160,22 @@ router.get('/:userId/histories', authController.verifyToken, async (req, res) =>
         }
         const [gameHistory] = await User.findGameDetailsByUserId(userId);
         return res.status(200).json(gameHistory);
+
+    } catch (error) {
+        console.log(error);
+        return ErrorHandler.getInternalError(res, error, 'Error retrieving game history');
+    }
+});
+
+
+router.get('/histories', async (req, res) => {
+
+    try {
+        const [storedUser] = await User.retrieveRanking();
+        if (storedUser.length <= 0) {
+            return ErrorHandler.getNotFound(res, 'Ranking not found');
+        }
+        return res.status(200).json(storedUser);
 
     } catch (error) {
         console.log(error);

@@ -36,9 +36,10 @@ module.exports = class User {
 
 
     static async saveGameDetails(gameDetails, user_id, date) {
+        let punctuation = gameDetails.totalHits/ gameDetails.timeConsumed;
         return db.promise().execute(
-            'INSERT INTO game_history (totalHits, timeConsumed, username, result, date, user_id) VALUES (?, ?, ?, ?, ?, ?)',
-            [gameDetails.totalHits, gameDetails.timeConsumed, gameDetails.username, gameDetails.result, date, user_id]
+            'INSERT INTO game_history (totalHits, timeConsumed, username, result, date, punctuation, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [gameDetails.totalHits, gameDetails.timeConsumed, gameDetails.username, gameDetails.result, date, punctuation, user_id]
         );
     }
 
@@ -48,6 +49,11 @@ module.exports = class User {
         );
     }
 
+    static async retrieveRanking() {
+        return db.promise().query(
+            'SELECT * FROM game_history ORDER BY punctuation ASC LIMIT 15'
+        );
+    }
 
     static async deleteUserFromTable() {
         return db.promise().execute('DELETE FROM battleship_test.users');
