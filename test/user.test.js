@@ -241,7 +241,7 @@ describe('User workflow tests', () => {
             expect(response.statusCode).toBe(200);
         })
 
-        test("Delete user - expected 200", async () => {
+        test("Delete user - expected 401", async () => {
             const response = await request(server).delete(`/users/${decoded.id}`)
             expect(response.statusCode).toBe(401);
         })

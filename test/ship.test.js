@@ -101,15 +101,39 @@ describe('Run ship test', () => {
         })
 
         test("Retrieve ship", async () => {
-            const response = await request(server).get(`/users/${decoded.id}/games/${gameId}`).set('Authorization', token);
+            const response = await request(server).get(`/users/${decoded.id}/games/${gameId}`)
+                .set('Authorization', token);
             expect(response.statusCode).toBe(200);
+        })
+
+        test("Delete game - user not found", async () => {
+            const response = await request(server).delete(`/users/noExiste/games/${gameId}`)
+                .set('Authorization', token);
+            expect(response.statusCode).toBe(404);
+        })
+
+        test("Delete game - expected 401", async () => {
+            const response = await request(server).delete(`/users/${decoded.id}/games/${gameId}`)
+            expect(response.statusCode).toBe(401);
+        })
+
+        test("Delete game - expected 200", async () => {
+            const response = await request(server).delete(`/users/${decoded.id}/games/${gameId}`)
+                .set('Authorization', token);
+            expect(response.statusCode).toBe(200);
+        })
+
+        test("Delete game - expected 204", async () => {
+            const response = await request(server).delete(`/users/${decoded.id}/games/${gameId}`)
+                .set('Authorization', token);
+            expect(response.statusCode).toBe(204);
         })
 
     });
 
 
-    test('Delete content from game and user tables', async () => {
-        await Ship.deleteGameAndUserTable();
+    test('Delete content from user table', async () => {
+        await User.deleteUserFromTable();
     })
 
 })

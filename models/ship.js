@@ -73,7 +73,6 @@ module.exports = class Ship {
             'INSERT INTO ' + table + ' (type, length, isHorizontal, isVisible, hit, head, game_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
             [ship.type, ship.length, ship.isHorizontal, ship.isVisible, ship.hit, ship.head, gameId]
         );
-
     }
 
 
@@ -94,18 +93,10 @@ module.exports = class Ship {
             'INSERT INTO previous_shots (row, col, game_id) VALUES (?, ?, ?)',
             [cell.row, cell.col, gameId]
         );
-
     }
 
-    static async deleteGameAndUserTable() {
-        try {
-            await Promise.all([
-                await db.promise().execute('DELETE FROM battleship_test.games;'),
-                await db.promise().execute('DELETE FROM battleship_test.users;'),
-            ]);
-        } catch (error) {
-            console.error('Error deleting user or games:', error);
-        }
+    static async deleteGameByGameId(gameId) {
+        return db.promise().execute('DELETE FROM games WHERE id = ?', [gameId]);
     }
 
 }
