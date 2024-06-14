@@ -94,8 +94,12 @@ module.exports = class Ship {
             'INSERT INTO previous_shots (row, col, game_id) VALUES (?, ?, ?)',
             [cell.row, cell.col, gameId]
         );
-
     }
+
+    static async deleteGameByGameId(gameId) {
+        return db.promise().execute('DELETE FROM games WHERE id = ?', [gameId]);
+    }
+
 
     static async deleteGameAndUserTable() {
         try {

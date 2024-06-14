@@ -50,13 +50,7 @@ module.exports = class User {
 
 
     static async deleteUserFromTable() {
-        try {
-            await Promise.all([
-                await db.promise().execute('DELETE FROM battleship_test.users'),
-            ]);
-        } catch (error) {
-            console.error('Error deleting user or history:', error);
-        }
+        return db.promise().execute('DELETE FROM battleship_test.users');
     }
 
 }
