@@ -1,5 +1,5 @@
 require('dotenv').config();
-require('./util/createTable');
+//require('./util/createTable');
 
 const userRoute = require('./router/user');
 

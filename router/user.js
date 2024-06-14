@@ -251,8 +251,12 @@ router.get('/:userId/games', authController.verifyToken, async (req, res) => {
 router.delete('/:userId/games/:gameId', authController.verifyToken, async (req, res) => {
     try {
         const [storedUser] = await User.findByUserId(req.params.userId);
+        const [storedGame] = await Ship.findGameByGameId(req.params.gameId);
 
         if (storedUser.length <= 0) {
+            return res.status(404).json({message: "User not found"});
+        }
+        if (storedGame.length <= 0) {
             return res.status(204).json({message: "User not found"});
         }
         const deleteResponse = Ship.deleteGameByGameId(req.params.gameId);
