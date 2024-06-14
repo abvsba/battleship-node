@@ -13,6 +13,12 @@ module.exports = class User {
         );
     }
 
+    static async findByEmail(email) {
+        return db.promise().query(
+            'SELECT * FROM users WHERE email = ?', [email]
+        );
+    }
+
     static async findByUserId(userId) {
         return db.promise().query(
             'SELECT * FROM users WHERE id = ?', [userId]

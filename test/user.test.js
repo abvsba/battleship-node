@@ -177,6 +177,11 @@ describe('User workflow tests', () => {
             expect(response.statusCode).toBe(404);
         })
 
+        test("Retrieve game ranking - expected 404", async () => {
+            const response = await request(server).get(`/users/histories`);
+            expect(response.statusCode).toBe(404);
+        })
+
         test("Save game details - expected 400", async () => {
             const response = await request(server).post(`/users/${decoded.id}/histories`).set('Authorization', token);
             expect(response.statusCode).toBe(400);
@@ -209,6 +214,11 @@ describe('User workflow tests', () => {
             expect(response.statusCode).toBe(200);
         })
 
+        test("Retrieve game ranking - expected 200", async () => {
+            const response = await request(server).get(`/users/histories`);
+            expect(response.statusCode).toBe(200);
+        })
+
     });
 
 
@@ -222,12 +232,12 @@ describe('User workflow tests', () => {
         });
 
         test("Get user", async () => {
-            const response = await request(server).get(`/users/${users[1].username}`);
+            const response = await request(server).get(`/users/${users[1].username}/username`);
             expect(response.statusCode).toBe(200);
         })
 
         test("Get user - expected 404", async () => {
-            const response = await request(server).get('/users/noExist');
+            const response = await request(server).get('/users/noExist/username');
             expect(response.statusCode).toBe(404);
         })
 
