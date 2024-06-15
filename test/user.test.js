@@ -231,13 +231,23 @@ describe('User workflow tests', () => {
             expect(response.statusCode).toBe(201);
         });
 
-        test("Get user", async () => {
+        test("Get username - expected 200", async () => {
             const response = await request(server).get(`/users/${users[1].username}/username`);
             expect(response.statusCode).toBe(200);
         })
 
-        test("Get user - expected 404", async () => {
+        test("Get username - expected 404", async () => {
             const response = await request(server).get('/users/noExist/username');
+            expect(response.statusCode).toBe(404);
+        })
+
+        test("Get email - expected 200", async () => {
+            const response = await request(server).get(`/users/${users[1].email}/email`);
+            expect(response.statusCode).toBe(200);
+        })
+
+        test("Get email - expected 404", async () => {
+            const response = await request(server).get('/users/noExist/email');
             expect(response.statusCode).toBe(404);
         })
 
