@@ -57,7 +57,7 @@ module.exports = class User {
 
     static async retrieveRanking() {
         return db.promise().query(
-            'SELECT * FROM game_history ORDER BY punctuation ASC LIMIT 15'
+            'SELECT * FROM game_history WHERE result = win ORDER BY totalHits ASC, timeConsumed ASC LIMIT 15'
         );
     }
 
