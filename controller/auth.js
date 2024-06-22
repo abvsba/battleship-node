@@ -12,12 +12,7 @@ exports.userWithHashedPassword = async (user) => {
 
 
 exports.hashPassword = async (password) => {
-    try {
-        return await bcrypt.hash(password, 12);
-    }
-    catch (error) {
-        console.error('Error hashing password:', error);
-    }
+    return await bcrypt.hash(password, 12);
 
 };
 

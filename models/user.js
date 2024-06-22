@@ -42,10 +42,10 @@ module.exports = class User {
 
 
     static async saveGameDetails(gameDetails, user_id, date) {
-        let punctuation = gameDetails.totalHits/ gameDetails.timeConsumed;
+        let speed = parseFloat((gameDetails.totalHits/ gameDetails.timeConsumed).toFixed(2));
         return db.promise().execute(
-            'INSERT INTO game_history (totalHits, timeConsumed, username, result, date, punctuation, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [gameDetails.totalHits, gameDetails.timeConsumed, gameDetails.username, gameDetails.result, date, punctuation, user_id]
+            'INSERT INTO game_history (totalHits, timeConsumed, username, result, date, speed, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [gameDetails.totalHits, gameDetails.timeConsumed, gameDetails.username, gameDetails.result, date, speed, user_id]
         );
     }
 
