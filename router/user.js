@@ -16,9 +16,6 @@ router.post('/signup', async (req, res) => {
         return ErrorHandler.getBadRequest(res);
     }
     try {
-        if (user.username == null) {
-            return ErrorHandler.getBadRequest(res, 'Bad request')
-        }
         const [storedUser] = await User.findByUsername(user.username);
 
         if (storedUser.length > 0) {
@@ -30,7 +27,6 @@ router.post('/signup', async (req, res) => {
         return res.status(201).json({message: 'User created', user: user});
 
     } catch (error) {
-        console.log(error);
         return ErrorHandler.getInternalError(res, error, 'Error creating user');
     }
 });
@@ -56,7 +52,6 @@ router.post('/login', async (req, res) => {
         return res.status(200).json({ token: token });
 
     } catch (error) {
-        console.log(error);
         return ErrorHandler.getInternalError(res, error, 'Error login user');
     }
 });
@@ -86,7 +81,6 @@ router.patch('/:userId/password', authController.verifyToken, async (req, res) =
         return res.status(200).json({message: 'Password updated'});
     }
     catch (error) {
-        console.log(error);
         return ErrorHandler.getInternalError(res, error, 'Error updating password');
     }
 });
@@ -98,12 +92,11 @@ router.get('/:username/username', async (req, res) => {
     try {
         const [storedUser] = await User.findByUsername(username);
         if (storedUser.length <= 0) {
-            return ErrorHandler.getNotFound(res, 'User not found');
+            return ErrorHandler.getNotFound(res, 'User username not found');
         }
         return res.status(200).json( { username : storedUser[0].username} );
 
     } catch (error) {
-        console.log(error);
         return ErrorHandler.getInternalError(res, error, 'Error retrieving username');
     }
 });
@@ -115,12 +108,11 @@ router.get('/:email/email', async (req, res) => {
     try {
         const [storedUser] = await User.findByEmail(email);
         if (storedUser.length <= 0) {
-            return ErrorHandler.getNotFound(res, 'User not found');
+            return ErrorHandler.getNotFound(res, 'User email not found');
         }
         return res.status(200).json( { email : storedUser[0].email} );
 
     } catch (error) {
-        console.log(error);
         return ErrorHandler.getInternalError(res, error, 'Error retrieving email');
     }
 });
@@ -137,7 +129,6 @@ router.delete('/:userId', authController.verifyToken, async (req, res) => {
         return res.status(200).json(deleteResponse);
 
     } catch (error) {
-        console.log(error);
         return ErrorHandler.getInternalError(res, error);
     }
 });
@@ -180,7 +171,6 @@ router.get('/:userId/histories', authController.verifyToken, async (req, res) =>
         return res.status(200).json(gameHistory);
 
     } catch (error) {
-        console.log(error);
         return ErrorHandler.getInternalError(res, error, 'Error retrieving game history');
     }
 });
@@ -189,15 +179,11 @@ router.get('/:userId/histories', authController.verifyToken, async (req, res) =>
 router.get('/histories', async (req, res) => {
 
     try {
-        const [storedUser] = await User.retrieveRanking();
-        if (storedUser.length <= 0) {
-            return ErrorHandler.getNotFound(res, 'Ranking not found');
-        }
-        return res.status(200).json(storedUser);
+        const [storedRanking] = await User.retrieveRanking();
+        return res.status(200).json(storedRanking);
 
     } catch (error) {
-        console.log(error);
-        return ErrorHandler.getInternalError(res, error, 'Error retrieving game history');
+        return ErrorHandler.getInternalError(res, error, 'Error retrieving Ranking');
     }
 });
 
@@ -206,6 +192,11 @@ router.get('/histories', async (req, res) => {
 router.post('/:userId/games/save', authController.verifyToken, async (req, res) => {
     const game = req.body.game;
     const userId = req.params.userId;
+
+    const [storedUser] = await User.findByUserId(userId);
+    if (storedUser.length <= 0) {
+        return ErrorHandler.getNotFound(res, 'User not found');
+    }
 
     if (game === undefined || game.name === undefined || game.fireDirection === undefined ||
         game.totalPlayerHits === undefined || game.previousShots === undefined) {
@@ -216,7 +207,7 @@ router.post('/:userId/games/save', authController.verifyToken, async (req, res) 
         return res.status(201).json({message: 'Ship saved', gameId: gameId});
     }
     catch (error) {
-        console.log(error);
+        console.log()
         return ErrorHandler.getInternalError(res, error, 'Error saving game');
     }
 });
@@ -228,8 +219,13 @@ router.get('/:userId/games/:gameId', authController.verifyToken, async (req, res
     const gameId = req.params.gameId;
 
     try {
-        let game = await Ship.findGamesByUserIdAndGameId(userId, gameId);
-        if (!game) {
+        const [storedUser] = await User.findByUserId(userId);
+        if (storedUser.length <= 0) {
+            return ErrorHandler.getNotFound(res, 'User not found');
+        }
+
+        let [game] = await Ship.findGamesByUserIdAndGameId(userId, gameId);
+        if (!game[0] || game[0].name === undefined || game[0].totalHits === undefined || game[0].fireDirection === undefined) {
             return ErrorHandler.getNotFound(res, 'Game not found');
         }
         const [storedSelfShip] = await Ship.findByGameId(gameId, 'self_ships');
@@ -245,6 +241,7 @@ router.get('/:userId/games/:gameId', authController.verifyToken, async (req, res
         if (storedSelfShip.length <= 0 || storedRivalShip.length <= 0) {
             return ErrorHandler.getNotFound(res, 'Ship not found');
         }
+
         for (let i = 0; i < storedSelfShip.length; i++) {
             convertShip(storedSelfShip[i]);
             convertShip(storedRivalShip[i]);
@@ -259,7 +256,6 @@ router.get('/:userId/games/:gameId', authController.verifyToken, async (req, res
             });
     }
     catch (error) {
-        console.log(error);
         return ErrorHandler.getInternalError(res, error, 'Error retrieving game by id');
     }
 });
@@ -269,15 +265,18 @@ router.get('/:userId/games', authController.verifyToken, async (req, res) => {
     const userId = req.params.userId;
 
     try {
+        const [storedUser] = await User.findByUserId(userId);
         const [storedGames] = await Ship.findGamesByUserId(userId);
 
+        if (storedUser.length <= 0) {
+            return res.status(404).json({message: "User not found"});
+        }
         if (storedGames.length <= 0) {
             return ErrorHandler.getNotFound(res, 'Game not found');
         }
         return res.status(200).json(storedGames);
     }
     catch (error) {
-        console.log(error);
         return ErrorHandler.getInternalError(res, error, 'Error retrieving games');
     }
 });
@@ -298,7 +297,6 @@ router.delete('/:userId/games/:gameId', authController.verifyToken, async (req, 
         return res.status(200).json(deleteResponse);
 
     } catch (error) {
-        console.log(error);
         return ErrorHandler.getInternalError(res, error);
     }
 });
